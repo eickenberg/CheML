@@ -1,7 +1,14 @@
 """Dataset loader helpers. This file collects everything related to downloading
 and organizing CheML and other open datasets for computational chemistry."""
 import os
-import urllib2
+try:
+    from urllib.request import urlopen
+    from urllib.error import HTTPError, URLError
+except:
+    from urllib2 import urlopen, HTTPError, URLError
+import pickle
+from sklearn.datasets.base import Bunch
+
 
 def get_data_dirs(data_dir=None):
     """Returns a priority list of folders where to search for a dataset.
@@ -61,6 +68,50 @@ dataset_info = dict(
 #    request.add_header("Authorization", "Basic {}".format(user_pass))
 #    return urllib2.urlopen(request)
 
+
+def _find_file(paths, filename):
+
+    abs_paths = [os.path.join(path, filename) for path in paths]
+    for filepath in abs_paths:
+        if os.path.exists(filepath):
+            return filepath
+    return None
+
+
+def _get_first_writeable_path(paths, filename):
+
+    abs_paths = [os.path.join(path, filename) for path in paths]
+    dirs = [os.path.dirname(filepath) for filepath in abs_paths]
+#    basenames = [os.path.basename(filepath) for filepath in abs_paths]
+    errors = []
+    for dirname, filename in zip(dirs, abs_paths):
+        try:
+            os.makedirs(dirname, exist_ok=True)
+            existed = os.path.exists(filename)
+            with open(filename, 'a'):
+                pass
+            if not existed:
+                os.remove(filename)
+            return filename
+        except Exception as e:
+            errors.append(e)
+    raise OSError(
+            "CheML could not store in any of the following directories:\n\n" +
+            "\n".join(dirs))
+
+
+def _download(url, filename):
+
+    try:
+        f = urlopen(url)
+        with open(filename, 'wb') as local_file:
+            local_file.write(f.read())
+    except urllib2.URLError as e:
+        raise
+    except urllib2.HTTPError as e:
+        raise
+
+
 def _get_or_download_dataset(dataset_name, path=None):
     rel_path, url = dataset_info[dataset_name]
     
@@ -68,5 +119,52 @@ def _get_or_download_dataset(dataset_name, path=None):
         paths = get_data_dirs()
     else:
         paths = [path]
+    filename = _find_file(paths, rel_path)
+    if filename is not None:
+        return filename
+    else:
+        filename = _get_first_writeable_path(paths, rel_path)
+        print("Downloading {} to {}...".format(url, filename))
+        _download(url, filename)
+        print("... done.")
+        return filename
+
+
+def _open_HF_pickle(filename):
+    # hack from http://stackoverflow.com/questions/11305790/pickle-incompatability-of-numpy-arrays-between-python-2-and-3
+    # Needs to be extensively tested between versions
+
+
+    with open(filename, 'rb') as f:
+        u = pickle._Unpickler(f)
+        u.encoding = 'latin1'
+        p = u.load()
+    return Bunch(**p)
+
+
+def load_HF2(path=None):
+    filename = _get_or_download_dataset('HF2', path=path)
+    return _open_HF_pickle(filename)
+
+def load_HF3(path=None, large=False):
+    dataset_name = 'HF3_10K' if large else 'HF3_1K'
+    filename = _get_or_download_dataset(dataset_name, path=path)
+    return _open_HF_pickle(filename)
+
+def load_HF4(path=None, large=False):
+    dataset_name = 'HF4_10K' if large else 'HF4_1K'
+    filename = _get_or_download_dataset(dataset_name, path=path)
+    return _open_HF_pickle(filename)
+
+def load_HF5(path=None, large=False):
+    dataset_name = 'HF5_10K' if large else 'HF5_1K'
+    filename = _get_or_download_dataset(dataset_name, path=path)
+    return _open_HF_pickle(filename)
+
+def load_HF6(path=None, large=False):
+    dataset_name = 'HF6_10K' if large else 'HF6_1K'
+    filename = _get_or_download_dataset(dataset_name, path=path)
+    return _open_HF_pickle(filename)
+
 
 
