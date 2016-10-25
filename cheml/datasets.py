@@ -59,7 +59,7 @@ dataset_info = dict(
     HX4=("HF/HX4.pkl", HF_URL_BASE + "data_HX4.pkl"),
     HX5=("HF/HX5.pkl", HF_URL_BASE + "data_HX5.pkl"),
     HX6=("HF/HX6.pkl", HF_URL_BASE + "data_HX6.pkl"),
-    QM7=("GDB13/qm7.tar.gz", "http://quantum-machine.org/code/nn-qm7.tar.gz")
+    QM7=("GDB13/qm7.mat", "http://quantum-machine.org/data/qm7.mat")
     )
 
 
@@ -87,7 +87,7 @@ def _get_first_writeable_path(paths, filename):
     errors = []
     for dirname, filename in zip(dirs, abs_paths):
         try:
-            if not os.exists(dirname):
+            if not os.path.exists(dirname):
                 os.makedirs(dirname)
             existed = os.path.exists(filename)
             with open(filename, 'a'):
@@ -173,9 +173,8 @@ def load_HF6(path=None, large=False):
 
 
 def load_qm7(path=None):
-    fname = _find_file(get_data_dirs(data_dir=path), "GDB13/qm7.mat")
-    if fname is None:
-        tarfname = _get_or_download_dataset("QM7", path=path)
+    filename = _get_or_download_dataset("QM7", path=path)
+    return filename
 
 
 
