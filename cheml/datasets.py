@@ -58,7 +58,8 @@ dataset_info = dict(
     HX3=("HF/HX3.pkl", HF_URL_BASE + "data_HX3.pkl"),
     HX4=("HF/HX4.pkl", HF_URL_BASE + "data_HX4.pkl"),
     HX5=("HF/HX5.pkl", HF_URL_BASE + "data_HX5.pkl"),
-    HX6=("HF/HX6.pkl", HF_URL_BASE + "data_HX6.pkl")
+    HX6=("HF/HX6.pkl", HF_URL_BASE + "data_HX6.pkl"),
+    QM7=("GDB13/qm7.tar.gz", "http://quantum-machine.org/code/nn-qm7.tar.gz")
     )
 
 
@@ -169,6 +170,12 @@ def load_HF6(path=None, large=False):
     dataset_name = 'HF6_10K' if large else 'HF6_1K'
     filename = _get_or_download_dataset(dataset_name, path=path)
     return _open_HF_pickle(filename)
+
+
+def load_qm7(path=None):
+    fname = _find_file(get_data_dirs(data_dir=path), "GDB13/qm7.mat")
+    if fname is None:
+        tarfname = _get_or_download_dataset("QM7", path=path)
 
 
 
