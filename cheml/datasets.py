@@ -8,6 +8,7 @@ except:
     from urllib2 import urlopen, HTTPError, URLError
 import pickle
 from sklearn.datasets.base import Bunch
+from scipy.io import loadmat
 
 
 def get_data_dirs(data_dir=None):
@@ -174,7 +175,11 @@ def load_HF6(path=None, large=False):
 
 def load_qm7(path=None):
     filename = _get_or_download_dataset("QM7", path=path)
-    return filename
+    qm7_file = loadmat(filename)
+    qm7_bunch = Bunch(**{k:v for k, v in qm7_file.items()
+        if k in ['P', 'X', 'T', 'Z', 'R']})
+    return qm7_bunch
+
 
 
 
