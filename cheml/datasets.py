@@ -152,6 +152,12 @@ def _open_HF_pickle(filename):
 
 
 def load_HF2(path=None, large=False):
+    if large:
+        import warnings
+        warnings.warn("The loaded dataset contains linear molecules. The vast "
+                        "majority of them are aligned with the x-axis. A few of"
+                        " them are aligned with the z-axis. One-dimensionality"
+                        " can be restored by summing all coordinates.")
     dataset_name = 'HF2_7K' if large else 'HF2_1K'
     filename = _get_or_download_dataset(dataset_name, path=path)
     return _open_HF_pickle(filename)
