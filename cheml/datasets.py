@@ -240,12 +240,8 @@ def _gdb_align(bunch, align, only_planar, planarity_tol):
     pca = PCA()
     keep_molecule = []
     has_bonds = "O" in bunch
-#    stop
-    # import ipdb;ipdb.set_trace()
+   # import ipdb;ipdb.set_trace()
     for c,(positions, charges) in enumerate(zip(bunch.R, bunch.Z)):
-#        stop
-        if c + 1 % 100 == 0:
-            print(c, end='\r'); sys.stdout.flush()
         transformed = np.vstack([
             pca.fit_transform(positions[charges != 0]),
             np.zeros([(charges == 0).sum(), 3])])
