@@ -299,7 +299,7 @@ def load_qm9(path=None, align=False, only_planar=False, planarity_tol=.01):
     # import ipdb;ipdb.set_trace()
     filename = _get_or_download_dataset("QM9", path=path, suffix='.tar.gz')
     filename_bonds = _get_or_download_dataset("QM9_bonds", path=path, 
-                                                    suffix='.npz')
+                                                    suffix=None)
     qm9_file = _open_pickle(filename)
     qm9_bonds = np.load(filename_bonds)
     qm9_file['R'] = qm9_file['xyz']
